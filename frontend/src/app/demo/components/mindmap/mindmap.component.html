@@ -1,0 +1,19 @@
+<p-toast [style]="{marginTop: '80px', width: '320px'}"></p-toast>
+
+
+<p-scrollPanel id="scroll" [style]="{width: '100%', height: '600px'}">
+    <div id="map" [style]="'width: 100%; height: 100%'">
+
+    </div>
+</p-scrollPanel>
+
+<div class="col-12 lg:col-12 md:col-12 align-end">
+    <!--button pButton pRipple label="New" icon="pi pi-plus" class="p-button-success mr-2" (click)="openNew()"></button-->
+                        
+    <button pButton pRipple type="button" label="Exportar em PNG" (click)="exportPNG()"
+        class="p-button-rounded p-button-success mr-2 mb-2"></button>
+    <button pButton pRipple type="button" label="Exportar em SVG" (click)="exportSVG()"
+        class="p-button-rounded p-button-info mr-2 mb-2"></button>
+    <button pButton pRipple type="button" label="Exportar em Markdown" (click)="exportMarkdown()"
+        class="p-button-rounded p-button-warn mr-2 mb-2"></button>
+</div>
