@@ -2,6 +2,8 @@ import { Component, OnInit, ViewEncapsulation, Renderer2, AfterViewInit } from '
 import { MessageService } from 'primeng/api';
 import MindElixir from "mind-elixir";
 import painter from 'mind-elixir/dist/painter';
+import { BundleEntry, Patient } from 'fhir/r4';
+import { FhirService } from '../../service/fhir.service';
 
 @Component({
     providers: [MessageService],
@@ -10,7 +12,13 @@ import painter from 'mind-elixir/dist/painter';
 
 export class MindmapComponent implements OnInit {
 
-    public hasPermission: number = 0;
+    patients: BundleEntry<Patient>[] = [];
+
+    selectedPatients: Patient[] = [];
+
+    patientCols: any[] = [];
+
+    display: boolean = false;
 
     public ME = new MindElixir({
         el: "#map",
@@ -24,10 +32,21 @@ export class MindmapComponent implements OnInit {
       });
       
     constructor(
+        private fhirService: FhirService,
         private messageService: MessageService) {
     }
 
     ngOnInit() {
+        this.fhirService.getAllPatients().subscribe(data => this.patients = data.entry!);
+
+        this.patientCols = [
+            { field: 'resource.identifier.2.value', header: 'Number' },
+            { field: 'resource.birthDate', header: 'Birth Date' },
+            { field: 'resource.gender', header: 'Gender' },
+            { field: 'patient.resource.name[0].given[0]', header: 'Name' },
+            { field: 'patient.resource.name[0].family[0]', header: 'Family Name' }
+        ];
+
         this.ME = new MindElixir({
             el: "#map",
             direction: MindElixir.LEFT,
@@ -152,6 +171,12 @@ export class MindmapComponent implements OnInit {
         element.click();
 
         document.body.removeChild(element);
+    }
+
+    getRecord(patientId: number) {
+        this.display = false;     
+        this.ME = new MindElixir(patientId);
+        this.ME.init(); 
     }
 
 }

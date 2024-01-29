@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-  <Document name="fhir-server.ZPM">
+  <Document name="clinical-mindmap-viewer.ZPM">
     <Module>
       <Name>clinical-mindmap-viewer</Name>
       <Version>1.0.0</Version>
       <Description>Mindmap clinical viewer</Description>
       <Keywords>FHIR,Clinical,Viewer</Keywords>
       <Packaging>module</Packaging>
-    <SourcesRoot>src</SourcesRoot>
-    <Invokes>
-    <Invoke Class="fhirtemplate.Setup" Method="SetupFHIRServer" Phase="Activate" When="After" ></Invoke>
-    </Invokes>
-    <Resource Name="fhirtemplate.PKG"/>
-    <FileCopy Name="data/fhir/" Target="${mgrdir}test-data-fhir/"/>
+      <SourcesRoot>src</SourcesRoot>
+      <Invokes>
+        <Invoke Class="fhirtemplate.Setup" Method="SetupFHIRServer" Phase="Activate" When="After"></Invoke>
+      </Invokes>
+      <Resource Name="fhirtemplate.PKG" />
+      <FileCopy Name="data/fhir/" Target="${mgrdir}test-data-fhir/" />
+
       <CSPApplication
         Url="/fhirUI"
         SourcePath="/fhirUI"
@@ -20,7 +21,23 @@
         ServeFiles="1"
         Recurse="1"
         CookiePath="/fhirUI"
-       />
+      />
+
+      <CSPApplication
+        CookiePath="/mindmap/"
+        DefaultTimeout="900"
+        SourcePath="/src/csp"
+        DeployPath="${cspdir}/csp/${namespace}/"
+        MatchRoles=":{$dbrole}"
+        PasswordAuthEnabled="1"
+        Recurse="1"
+        ServeFiles="1"
+        ServeFilesTimeout="3600"
+        UnauthenticatedEnabled="0"
+        Url="/mindmap"
+        UseSessionCookie="2"
+      />
+
     </Module>
   </Document>
 </Export>

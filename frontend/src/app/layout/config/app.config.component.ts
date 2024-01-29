@@ -1,6 +1,5 @@
 import { Component, Input } from '@angular/core';
 import { LayoutService } from '../service/app.layout.service';
-import { MenuService } from '../app.menu.service';
 
 @Component({
     selector: 'app-config',
@@ -12,8 +11,7 @@ export class AppConfigComponent {
     scales: number[] = [12, 13, 14, 15, 16];
 
     constructor(
-        public layoutService: LayoutService,
-        public menuService: MenuService
+        public layoutService: LayoutService
     ) {}
 
     get visible(): boolean {

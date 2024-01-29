@@ -1,15 +1,62 @@
 <p-toast [style]="{marginTop: '80px', width: '320px'}"></p-toast>
 
+<p-dialog header="Patient List" [(visible)]="display" [modal]="true" showEffect="fade" [style]="{width: '70vw'}"
+    [breakpoints]="{'960px': '75vw'}">
+    <p-table #dt [value]="patients" [columns]="patientCols" responsiveLayout="scroll" [rows]="10"
+        [paginator]="true" [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true" 
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        [rowHover]="true" dataKey="id">
+        <ng-template pTemplate="header">
+            <tr>
+                <th pSortableColumn="resource.identifier.2.value">Number <p-sortIcon
+                        field="resource.identifier.2.value"></p-sortIcon></th>
+                <th pSortableColumn="resource.name.0.given.0">Name <p-sortIcon
+                        field="resource.name.0.given.0"></p-sortIcon></th>
+                <th pSortableColumn="resource.name.0.family.0">Family Name <p-sortIcon
+                        field="resource.name.0.family.0"></p-sortIcon></th>
+                <th pSortableColumn="resource.gender">Gender <p-sortIcon field="resource.gender"></p-sortIcon></th>
+                <th pSortableColumn="resource.birthDate">Birth date <p-sortIcon field="resource.birthDate"></p-sortIcon>
+                </th>
+                <th></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-patient>
+            <tr>
+                <td style="width:10%; min-width:10rem;">
+                    <span class="p-column-title">Number</span>
+                    {{patient.resource.identifier[2].value}}
+                </td>
+                <td style="width:25%; min-width:10rem;">
+                    <span class="p-column-title">Name</span>
+                    {{patient.resource.name[0].given[0]}}
+                </td>
+                <td style="width:20%; min-width:10rem;">
+                    <span class="p-column-title">Family Name</span>
+                    {{patient.resource.name[0].family}}
+                </td>
+                <td style="width:15%; min-width:8rem;">
+                    <span class="p-column-title">Gender</span>
+                    {{patient.resource.gender}}
+                </td>
+                <td style="width:15%; min-width:10rem;">
+                    <span class="p-column-title">Birth Date</span>
+                    {{patient.resource.birthDate}}
+                </td>
+                <td>
+                    <div class="flex">
+                        <button pButton pRipple icon="pi pi-arrow-right" class="p-button-rounded mr-2"
+                            (click)="getRecord(patient.resource.id)"></button>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</p-dialog>
 
-<p-scrollPanel id="scroll" [style]="{width: '100%', height: '600px'}">
-    <div id="map" [style]="'width: 100%; height: 100%'">
-
-    </div>
-</p-scrollPanel>
-
-<div class="col-12 lg:col-12 md:col-12 align-end">
+<div class="col-12 lg:col-12 md:col-12 align-center">
     <!--button pButton pRipple label="New" icon="pi pi-plus" class="p-button-success mr-2" (click)="openNew()"></button-->
-                        
+    <button pButton pRipple type="button" label="Patients" (click)="display=true"
+        class="p-button-rounded p-button-error mr-2 mb-2"></button>
     <button pButton pRipple type="button" label="Exportar em PNG" (click)="exportPNG()"
         class="p-button-rounded p-button-success mr-2 mb-2"></button>
     <button pButton pRipple type="button" label="Exportar em SVG" (click)="exportSVG()"
@@ -17,3 +64,7 @@
     <button pButton pRipple type="button" label="Exportar em Markdown" (click)="exportMarkdown()"
         class="p-button-rounded p-button-warn mr-2 mb-2"></button>
 </div>
+
+<p-scrollPanel id="scroll" [style]="{width: '100%', height: '500px'}">
+    <div id="map" [style]="'width: 100%; height: 100%'"></div>
+</p-scrollPanel>

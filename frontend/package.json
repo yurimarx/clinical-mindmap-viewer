@@ -26,6 +26,7 @@
         "@fullcalendar/daygrid": "^6.0.3",
         "@fullcalendar/interaction": "^6.0.3",
         "@fullcalendar/timegrid": "^6.0.3",
+        "@types/fhir": "^0.0.37",
         "chart.js": "^3.3.2",
         "mind-elixir": "^0.19.8",
         "primeflex": "^3.3.1",

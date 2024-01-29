@@ -33,6 +33,7 @@
         "showSystem": false,
         "username": "_SYSTEM"
       }
-    ]
+    ],
+    "angular.enable-strict-mode-prompt": false
 
 }
