@@ -3,6 +3,7 @@ import { MessageService } from 'primeng/api';
 import MindElixir from "mind-elixir";
 import painter from 'mind-elixir/dist/painter';
 import { BundleEntry, Patient } from 'fhir/r4';
+import { v4 as uuidv4 } from 'uuid';
 import { FhirService } from '../../service/fhir.service';
 
 @Component({
@@ -23,7 +24,7 @@ export class MindmapComponent implements OnInit {
     public ME = new MindElixir({
         el: "#map",
         direction: MindElixir.LEFT,
-        data: MindElixir.new("new topic"),
+        data: MindElixir.new("Select a patient"),
         draggable: true, // default true
         contextMenu: true, // default true
         toolBar: true, // default true
@@ -50,7 +51,7 @@ export class MindmapComponent implements OnInit {
         this.ME = new MindElixir({
             el: "#map",
             direction: MindElixir.LEFT,
-            data: MindElixir.new("new topic"),
+            data: MindElixir.new("Select a new patient"),
             draggable: true, // default true
             contextMenu: true, // default true
             toolBar: true, // default true
@@ -65,12 +66,12 @@ export class MindmapComponent implements OnInit {
         return window.location.hostname;
     }
 
-    getMindmapOptions(dataToRender) {
+    getMindmapOptions(dataToRender: Patient) {
         return (
             {
                 el: '#map',
                 direction: MindElixir.SIDE,
-                data: dataToRender == null ? MindElixir.new('Novo Mapa') : this.renderExistentMindmap(dataToRender),
+                data: dataToRender == null ? MindElixir.new('Select a patient') : this.renderExistentMindmap(dataToRender),
                 draggable: true, // default true
                 contextMenu: true, // default true
                 toolBar: true, // default true
@@ -116,26 +117,67 @@ export class MindmapComponent implements OnInit {
         this.downloadMD('mindmap.md', this.ME.getAllDataMd())
     }
 
-    renderExistentMindmap(data) {
+    renderExistentMindmap(data: Patient) {
 
-        let root = data[0]
+        let root = data
 
         let nodeData = {
             id: root.id,
-            topic: root.topic,
+            topic: root.name[0].given[0],
             root: true,
             style: {
-                background: root.background,
-                color: root.color,
-                fontSize: root.fontSize,
+                background: 'blue',
+                color: 'white',
+                fontSize: '30',
             },
-            hyperLink: root.hyperLink,
+            hyperLink: root.link,
             children: []
         }
-
-        this.createTree(nodeData, data)
-
+        let demographicChildren = [
+            {
+                id: uuidv4(),
+                topic: 'Name: ' + root.name[0].given[0]
+            },
+            {
+                id: uuidv4(),
+                topic: 'Family: ' + root.name[0].family[0]
+            },
+        ]
+        this.createMindItem(nodeData, 'Demographic data', 'purple', 'white', 20, demographicChildren);
         return { nodeData }
+    }
+
+    createDemograficData(nodeData, data: Patient) {
+        let newNode = {
+            id: data.id + 'rootDemografic',
+            topic: 'Demographic Data',
+            expanded: false,
+            root: false,
+            style: {
+                background: 'purple',
+                color: 'white',
+                fontSize: 20,
+            },
+            children: []
+        }
+        nodeData.children.push(newNode)
+    }
+
+    createMindItem(nodeData, text: string, background: string, color: string, fontSize: number, children: any[]) {
+        let newNode = {
+            id: uuidv4(),
+            topic: text,
+            expanded: false,
+            root: false,
+            style: {
+                background: background,
+                color: color,
+                fontSize: fontSize,
+            },
+            children: children
+        }
+        nodeData.children.push(newNode)
+        return newNode
     }
 
     createTree(nodeData, data) {
@@ -174,9 +216,16 @@ export class MindmapComponent implements OnInit {
     }
 
     getRecord(patientId: number) {
-        this.display = false;     
-        this.ME = new MindElixir(patientId);
-        this.ME.init(); 
+        this.fhirService.getPatientById(patientId).subscribe(
+            resp => {
+                this.ME = new MindElixir(this.getMindmapOptions(resp));
+                this.ME.init();
+                this.display = false;
+            }
+        );
+
+             
+        
     }
 
 }

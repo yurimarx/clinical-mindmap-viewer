@@ -1,11 +1,7 @@
  [![Gitter](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/clinical-mindmap-viewer)
- [![Quality Gate Status](https://community.objectscriptquality.com/api/project_badges/measure?project=intersystems_iris_community%2Fclinical-mindmap-viewer&metric=alert_status)](https://community.objectscriptquality.com/dashboard?id=clinical_mindmap_viewer%2Fclinical-mindmap-viewer)
- [![Reliability Rating](https://community.objectscriptquality.com/api/project_badges/measure?project=intersystems_iris_community%2Fclinical-mindmap-viewer&metric=reliability_rating)](https://community.objectscriptquality.com/dashboard?id=intersystems_iris_community%2Fclinical-mindmap-viewer)
+
 # clinical-mindmap-viewer
 This is a Clinical Viewer as a mindmap
-
-It setups a FHIR SERVER, imports the test data, present patient data into a mindmap.
-
 
 ## Installation 
 
@@ -24,7 +20,6 @@ Or call the following for installing programmatically:
 set sc=$zpm("install clinical-mindmap-viewer")
 ```
 
-
 ### Docker (e.g. for dev purposes)
 
 Clone/git pull the repo into any local directory
@@ -39,8 +34,12 @@ Open the terminal in this directory and run:
 $ docker-compose up -d
 ```
 
+## View the patients as mindmap
+
+Go to http://localhost:32783/mindmap/index.html
+
 ## Patient data
-The template goes with 5 preloaded patents in [/data/fhir](https://github.com/intersystems-community/iris-fhir-server-template/tree/master/data/fhir) folder which are being loaded during [docker build](https://github.com/intersystems-community/iris-fhir-server-template/blob/8bd2932b34468f14530a53d3ab5125f9077696bb/iris.script#L26)
+This app goes with 5 preloaded patents in [/data/fhir](https://github.com/intersystems-community/iris-fhir-server-template/tree/master/data/fhir) folder which are being loaded during [docker build](https://github.com/intersystems-community/iris-fhir-server-template/blob/8bd2932b34468f14530a53d3ab5125f9077696bb/iris.script#L26)
 You can generate more patients doing the following. Open shel terminal in repository folder and call:
 ```
 #./synthea-loader.sh 10
@@ -88,38 +87,3 @@ While open the page you will see search result for female anemic patients and gr
 [InterSystems IRIS FHIR Documentation](https://docs.intersystems.com/irisforhealth20203/csp/docbook/Doc.View.cls?KEY=HXFHIR)
 [FHIR API](http://hl7.org/fhir/resourcelist.html)
 [Developer Community FHIR section](https://community.intersystems.com/tags/fhir)
-
-## What's inside the repository
-
-### Dockerfile
-
-The simplest dockerfile which starts IRIS and imports Installer.cls and then runs the Installer.setup method, which creates IRISAPP Namespace and imports ObjectScript code from /src folder into it.
-Use the related docker-compose.yml to easily setup additional parametes like port number and where you map keys and host folders.
-Use .env/ file to adjust the dockerfile being used in docker-compose.
-
-
-### .vscode/settings.json
-
-Settings file to let you immedietly code in VSCode with [VSCode ObjectScript plugin](https://marketplace.visualstudio.com/items?itemName=daimor.vscode-objectscript))
-
-### .vscode/launch.json
-Config file if you want to debug with VSCode ObjectScript
-
-
-## Troubleshooting
-**ERROR #5001: Error -28 Creating Directory /usr/irissys/mgr/FHIRSERVER/**
-If you see this error it probably means that you ran out of space in docker.
-you can clean up it with the following command:
-```
-docker system prune -f
-```
-And then start rebuilding image without using cache:
-```
-docker-compose build --no-cache
-```
-and start the container with:
-```
-docker-compose up -d
-```
-
-This and other helpful commands you can find in [dev.md](https://github.com/intersystems-community/iris-fhir-template/blob/cd7e0111ff94dcac82377a2aa7df0ce5e0571b5a/dev.md)
