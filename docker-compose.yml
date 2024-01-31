@@ -5,6 +5,8 @@ services:
       context: .
       dockerfile: Dockerfile
     restart: always
+    hostname: clinical-mindmap
+    container_name: clinical-mindmap-iris
 #   command: --check-caps false
     ports: 
       - 32782:1972
