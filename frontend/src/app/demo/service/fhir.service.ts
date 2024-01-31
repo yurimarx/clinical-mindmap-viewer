@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { Observable, forkJoin, throwError } from 'rxjs';
 import { retry, catchError, map } from 'rxjs/operators';
 import { AllergyIntolerance, Bundle, BundleEntry, Condition, Encounter, Immunization, MedicationAdministration, MedicationDispense, MedicationRequest, MedicationStatement, Observation, Patient, Procedure } from 'fhir/r4';
+import { FullPatient } from '../domain/fullpatient';
 @Injectable({
     providedIn: 'root',
 })

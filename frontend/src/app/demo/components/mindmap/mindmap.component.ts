@@ -2,9 +2,10 @@ import { Component, OnInit, ViewEncapsulation, Renderer2, AfterViewInit } from '
 import { MessageService } from 'primeng/api';
 import MindElixir from "mind-elixir";
 import painter from 'mind-elixir/dist/painter';
-import { BundleEntry, Patient } from 'fhir/r4';
+import { AllergyIntolerance, BundleEntry, Condition, Encounter, Immunization, MedicationAdministration, MedicationDispense, MedicationRequest, MedicationStatement, Observation, Patient, Procedure } from 'fhir/r4';
 import { v4 as uuidv4 } from 'uuid';
 import { FhirService } from '../../service/fhir.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
     providers: [MessageService],
@@ -13,7 +14,32 @@ import { FhirService } from '../../service/fhir.service';
 
 export class MindmapComponent implements OnInit {
 
+    // Base url
+    baseurl = 'http://localhost:32783/fhir/r4';
+
     patients: BundleEntry<Patient>[] = [];
+
+    encounters: BundleEntry<Encounter>[] = [];
+
+    procedures: BundleEntry<Procedure>[] = [];
+
+    medicationRequests: BundleEntry<MedicationRequest>[] = [];
+
+    medicationStatements: BundleEntry<MedicationStatement>[] = [];
+
+    allergies: BundleEntry<AllergyIntolerance>[] = [];
+
+    immunizations: BundleEntry<Immunization>[] = [];
+
+    conditions: BundleEntry<Condition>[] = [];
+
+    observations: BundleEntry<Observation>[] = [];
+
+    medicationDispenses: BundleEntry<MedicationDispense>[] = [];
+
+    medicationAdministrations: BundleEntry<MedicationAdministration>[] = [];
+
+    patient: Patient = { "resourceType": "Patient" };
 
     selectedPatients: Patient[] = [];
 
@@ -30,10 +56,11 @@ export class MindmapComponent implements OnInit {
         toolBar: true, // default true
         nodeMenu: true, // default true
         keypress: true // default true
-      });
-      
+    });
+
     constructor(
         private fhirService: FhirService,
+        private http: HttpClient,
         private messageService: MessageService) {
     }
 
@@ -57,21 +84,21 @@ export class MindmapComponent implements OnInit {
             toolBar: true, // default true
             nodeMenu: true, // default true
             keypress: true // default true
-          });
-        this.ME.init(MindElixir.new("new topic"));     
-        
+        });
+        this.ME.init(MindElixir.new("new topic"));
+
     }
 
     getIpAddress() {
         return window.location.hostname;
     }
 
-    getMindmapOptions(dataToRender: Patient) {
+    getMindmapOptions() {
         return (
             {
                 el: '#map',
                 direction: MindElixir.SIDE,
-                data: dataToRender == null ? MindElixir.new('Select a patient') : this.renderExistentMindmap(dataToRender),
+                data: this.patient == null ? MindElixir.new('Select a patient') : this.renderExistentMindmap(),
                 draggable: true, // default true
                 contextMenu: true, // default true
                 toolBar: true, // default true
@@ -117,9 +144,9 @@ export class MindmapComponent implements OnInit {
         this.downloadMD('mindmap.md', this.ME.getAllDataMd())
     }
 
-    renderExistentMindmap(data: Patient) {
+    renderExistentMindmap() {
 
-        let root = data
+        let root = this.patient;
 
         let nodeData = {
             id: root.id,
@@ -133,6 +160,7 @@ export class MindmapComponent implements OnInit {
             hyperLink: root.link,
             children: []
         }
+
         let demographicChildren = [
             {
                 id: uuidv4(),
@@ -142,8 +170,91 @@ export class MindmapComponent implements OnInit {
                 id: uuidv4(),
                 topic: 'Family: ' + root.name[0].family[0]
             },
+            {
+                id: uuidv4(),
+                topic: 'Gender: ' + root.gender
+            },
+            {
+                id: uuidv4(),
+                topic: 'Birth Date: ' + root.birthDate
+            },
+            {
+                id: uuidv4(),
+                topic: 'Marital Status: ' + root.maritalStatus.text
+            },
+            {
+                id: uuidv4(),
+                topic: 'Race: ' + root.extension[0].extension[0].valueCoding.display
+            },
+            {
+                id: uuidv4(),
+                topic: 'Ethnicity: ' + root.extension[1].extension[0].valueCoding.display
+            },
+            {
+                id: uuidv4(),
+                topic: 'Mother\'s Maiden Name: ' + root.extension[2].valueString
+            },
+            {
+                id: uuidv4(),
+                topic: 'Birth Sex: ' + root.extension[3].valueCode
+            },
+            {
+                id: uuidv4(),
+                topic: 'Birth Place: ' + root.extension[4].valueAddress.city + ', ' + root.extension[4].valueAddress.state + ', ' + root.extension[4].valueAddress.country
+            },
         ]
         this.createMindItem(nodeData, 'Demographic data', 'purple', 'white', 20, demographicChildren);
+
+        let contactChildren = [
+            {
+                id: uuidv4(),
+                topic: 'Telecom: ' + root.telecom[0].value
+            },
+            {
+                id: uuidv4(),
+                topic: 'Address/Zip Code: ' + root.address[0].line + ', ' + root.address[0].postalCode
+            },
+            {
+                id: uuidv4(),
+                topic: 'City/State/Country: ' + root.address[0].city + ', ' + root.address[0].state + ', ' + root.address[0].country
+            },
+        ]
+
+        this.createMindItem(nodeData, 'Contact data', 'orange', 'white', 20, contactChildren);
+
+        let identificationChildren = [
+            {
+                id: uuidv4(),
+                topic: 'MRN: ' + root.identifier[1].value
+            },
+            {
+                id: uuidv4(),
+                topic: 'SSN: ' + root.identifier[2].value
+            },
+            {
+                id: uuidv4(),
+                topic: 'Driver\'s License: ' + root.identifier[3].value
+            },
+            {
+                id: uuidv4(),
+                topic: 'Passport: ' + root.identifier[4].value
+            }
+        ]
+
+        this.createMindItem(nodeData, 'Identification data', 'green', 'white', 20, identificationChildren);
+
+        let encounterChildren = [];
+
+        this.encounters.map((encounter) => {
+            encounterChildren.push({
+                id: uuidv4(),
+                topic: encounter.resource.type[0].text + ' - ' +  encounter.resource.period.start + ' to ' + encounter.resource.period.end
+            })
+        })
+
+        this.createMindItem(nodeData, 'Encounters', 'red', 'white', 20, encounterChildren);
+
+
         return { nodeData }
     }
 
@@ -180,27 +291,6 @@ export class MindmapComponent implements OnInit {
         return newNode
     }
 
-    createTree(nodeData, data) {
-        for (let i = 1; i < data.length; i++) {
-            if (data[i].parent == nodeData.id) {
-                let newNode = {
-                    id: data[i].id,
-                    topic: data[i].topic,
-                    expanded: false,
-                    root: false,
-                    style: {
-                        background: data[i].background,
-                        color: data[i].color,
-                        fontSize: data[i].fontSize,
-                    },
-                    hyperLink: data[i].hyperLink,
-                    children: []
-                }
-                nodeData.children.push(newNode)
-                this.createTree(newNode, data)
-            }
-        }
-    }
 
     downloadMD(filename, text) {
         var element = document.createElement('a');
@@ -216,16 +306,94 @@ export class MindmapComponent implements OnInit {
     }
 
     getRecord(patientId: number) {
-        this.fhirService.getPatientById(patientId).subscribe(
-            resp => {
-                this.ME = new MindElixir(this.getMindmapOptions(resp));
-                this.ME.init();
-                this.display = false;
-            }
-        );
 
-             
-        
+        this.fhirService.getPatientById(patientId).subscribe(data => {
+            this.patient = data;
+            this.getEncounters(patientId);
+            this.getProcedures(patientId);
+            this.getMedicationRequests(patientId);
+            this.getAllergies(patientId);
+            this.getImmunizations(patientId);
+            this.getConditions(patientId);
+            this.getObservations(patientId);
+            this.refreshMindmap();
+            this.display = false;
+        });
+
+    }
+
+    refreshMindmap() {
+        this.ME = new MindElixir(this.getMindmapOptions());
+        this.ME.init();
+    }
+
+    getEncounters(patientId: number) {
+        this.fhirService.getAllEncounters(patientId).subscribe(data => {
+            this.encounters = data.entry!;
+            this.refreshMindmap();
+        });
+    }
+
+    getProcedures(patientId: number) {
+        this.fhirService.getAllProcedures(patientId).subscribe(data => {
+            this.procedures = data.entry!;
+            this.refreshMindmap();
+        });
+    }
+
+    getMedicationRequests(patientId: number) {
+        this.fhirService.getAllMedicationRequests(patientId).subscribe(data => {
+            this.medicationRequests = data.entry!;
+            this.refreshMindmap();
+        });
+    }
+
+    getMedicationAdministrations(patientId: number) {
+        this.fhirService.getAllMedicationAdministrations(patientId).subscribe(data => {
+            this.medicationAdministrations = data.entry!;
+            this.refreshMindmap();
+        });
+    }
+
+    getMedicationDispenses(patientId: number) {
+        this.fhirService.getAllMedicationDispenses(patientId).subscribe(data => {
+            this.medicationDispenses = data.entry!;
+            this.refreshMindmap();
+        });
+    }
+
+    getMedicationStatements(patientId: number) {
+        this.fhirService.getAllMedicationStatements(patientId).subscribe(data => {
+            this.medicationStatements = data.entry!;
+            this.refreshMindmap();
+        });
+    }
+
+    getAllergies(patientId: number) {
+        this.fhirService.getAllAllergies(patientId).subscribe(data => {
+            this.allergies = data.entry!;
+            this.refreshMindmap();
+        });
+    }
+
+    getImmunizations(patientId: number) {
+        this.fhirService.getAllImmunizations(patientId).subscribe(data => {
+            this.immunizations = data.entry!;
+            this.refreshMindmap();
+        });
+    }
+
+    getConditions(patientId: number) {
+        this.fhirService.getAllConditions(patientId).subscribe(data => {
+            this.conditions = data.entry!;
+            this.refreshMindmap();
+        });
+    }
+
+    getObservations(patientId: number) {
+        this.fhirService.getAllObservations(patientId).subscribe(data => {
+            this.observations = data.entry!;
+        });
     }
 
 }
