@@ -23,7 +23,7 @@ export class MindmapComponent implements OnInit {
 
     procedures: BundleEntry<Procedure>[] = [];
 
-    medicationRequests: BundleEntry<MedicationRequest>[] = [];
+    medications: BundleEntry<MedicationRequest>[] = [];
 
     medicationStatements: BundleEntry<MedicationStatement>[] = [];
 
@@ -248,14 +248,66 @@ export class MindmapComponent implements OnInit {
         this.encounters.map((encounter) => {
             encounterChildren.push({
                 id: uuidv4(),
-                topic: encounter.resource.type[0].text + ' - ' +  encounter.resource.period.start + ' to ' + encounter.resource.period.end
+                topic: encounter.resource.type[0].text + ' - ' +  this.formatDateTime(encounter.resource.period.start) + ' to ' + this.formatDateTime(encounter.resource.period.end)
             })
         })
 
         this.createMindItem(nodeData, 'Encounters', 'red', 'white', 20, encounterChildren);
 
+        let procedureChildren = [];
 
-        return { nodeData }
+        this.procedures.map((procedure) => {
+            procedureChildren.push({
+                id: uuidv4(),
+                topic: procedure.resource.code.text + ' - ' +  this.formatDateTime(procedure.resource.performedPeriod.start) + ' to ' + this.formatDateTime(procedure.resource.performedPeriod.end)
+            })
+        })
+
+        this.createMindItem(nodeData, 'Procedures', 'black', 'white', 20, procedureChildren);
+
+        let medicationChildren = [];
+
+        this.medications.map((medication) => {
+            medicationChildren.push({
+                id: uuidv4(),
+                topic: medication.resource.medicationCodeableConcept.text // + ' - ' +  this.formatDateTime(medication.resource..start) + ' to ' + this.formatDateTime(procedure.resource.performedPeriod.end)
+            })
+        })
+
+        let immunizationChildren = [];
+
+        this.immunizations.map((immunization) => {
+            immunizationChildren.push({
+                id: uuidv4(),
+                topic: immunization.resource.vaccineCode.text // + ' - ' +  this.formatDateTime(medication.resource..start) + ' to ' + this.formatDateTime(procedure.resource.performedPeriod.end)
+            })
+        })
+
+        this.createMindItem(nodeData, 'Immunizations', 'grey', 'white', 20, immunizationChildren);
+
+        let conditionChildren = [];
+
+        this.conditions.map((condition) => {
+            conditionChildren.push({
+                id: uuidv4(),
+                topic: condition.resource.code.text // + ' - ' +  this.formatDateTime(medication.resource..start) + ' to ' + this.formatDateTime(procedure.resource.performedPeriod.end)
+            })
+        })
+
+        this.createMindItem(nodeData, 'Conditions', 'olive', 'white', 20, conditionChildren);
+
+        let observationChildren = [];
+
+        this.observations.map((observation) => {
+            observationChildren.push({
+                id: uuidv4(),
+                topic: observation.resource.code.text // + ' - ' +  this.formatDateTime(medication.resource..start) + ' to ' + this.formatDateTime(procedure.resource.performedPeriod.end)
+            })
+        })
+
+        this.createMindItem(nodeData, 'Observations', 'teal', 'white', 20, observationChildren);
+
+        return { nodeData } 
     }
 
     createDemograficData(nodeData, data: Patient) {
@@ -343,7 +395,7 @@ export class MindmapComponent implements OnInit {
 
     getMedicationRequests(patientId: number) {
         this.fhirService.getAllMedicationRequests(patientId).subscribe(data => {
-            this.medicationRequests = data.entry!;
+            this.medications = data.entry!;
             this.refreshMindmap();
         });
     }
@@ -393,7 +445,24 @@ export class MindmapComponent implements OnInit {
     getObservations(patientId: number) {
         this.fhirService.getAllObservations(patientId).subscribe(data => {
             this.observations = data.entry!;
+            this.refreshMindmap();
         });
+    }
+
+    formatDate(date: Date): string {
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
+    }
+    
+    formatDateTime(dateStr: string): string {
+        const date = new Date(dateStr);
+        const formattedDate = this.formatDate(date); // Reuse formatDate function
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        const seconds = date.getSeconds().toString().padStart(2, '0');
+        return `${formattedDate} ${hours}:${minutes}:${seconds}`;
     }
 
 }
