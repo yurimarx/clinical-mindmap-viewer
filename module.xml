@@ -3,7 +3,7 @@
   <Document name="clinical-mindmap-viewer.ZPM">
     <Module>
       <Name>clinical-mindmap-viewer</Name>
-      <Version>1.0.0</Version>
+      <Version>1.0.2</Version>
       <Description>Mindmap clinical viewer</Description>
       <Keywords>FHIR,Clinical,Viewer</Keywords>
       <Packaging>module</Packaging>
