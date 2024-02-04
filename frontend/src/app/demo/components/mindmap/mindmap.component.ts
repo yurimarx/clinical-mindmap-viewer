@@ -14,9 +14,6 @@ import { HttpClient } from '@angular/common/http';
 
 export class MindmapComponent implements OnInit {
 
-    // Base url
-    baseurl = 'http://localhost:32783/fhir/r4';
-
     patients: BundleEntry<Patient>[] = [];
 
     encounters: BundleEntry<Encounter>[] = [];
@@ -87,10 +84,6 @@ export class MindmapComponent implements OnInit {
         });
         this.ME.init(MindElixir.new("new topic"));
 
-    }
-
-    getIpAddress() {
-        return window.location.hostname;
     }
 
     getMindmapOptions() {

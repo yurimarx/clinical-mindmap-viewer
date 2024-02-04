@@ -1,16 +1,18 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, forkJoin, throwError } from 'rxjs';
-import { retry, catchError, map } from 'rxjs/operators';
-import { AllergyIntolerance, Bundle, BundleEntry, Condition, Encounter, Immunization, MedicationAdministration, MedicationDispense, MedicationRequest, MedicationStatement, Observation, Patient, Procedure } from 'fhir/r4';
-import { FullPatient } from '../domain/fullpatient';
+import { Observable, throwError } from 'rxjs';
+import { retry, catchError } from 'rxjs/operators';
+import { AllergyIntolerance, Bundle, Condition, Encounter, Immunization, MedicationAdministration, MedicationDispense, MedicationRequest, MedicationStatement, Observation, Patient, Procedure } from 'fhir/r4';
 @Injectable({
     providedIn: 'root',
 })
 export class FhirService {
 
     // Base url
-    baseurl = 'http://localhost:32783/fhir/r4';
+    //baseurl = 'http://localhost:32783/fhir/r4';
+
+    baseurl = 'http://' + location.hostname + ':' + location.port + '/fhir/r4';
+
 
     constructor(private http: HttpClient) { }
 
